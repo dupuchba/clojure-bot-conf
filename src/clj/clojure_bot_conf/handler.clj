@@ -1,7 +1,7 @@
 (ns clojure-bot-conf.handler
   (:require [compojure.core :refer [routes wrap-routes]]
             [clojure-bot-conf.layout :refer [error-page]]
-            [clojure-bot-conf.routes.home :refer [home-routes]]
+            [clojure-bot-conf.routes.callback :refer [home-routes]]
             [compojure.route :as route]
             [clojure-bot-conf.env :refer [defaults]]
             [mount.core :as mount]

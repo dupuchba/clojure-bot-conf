@@ -1,4 +1,4 @@
-(ns clojure-bot-conf.routes.home
+(ns clojure-bot-conf.routes.callback
   (:require [clojure-bot-conf.layout :as layout]
             [compojure.core :refer [defroutes GET]]
             [ring.util.http-response :as response]

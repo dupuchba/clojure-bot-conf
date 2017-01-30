@@ -24,12 +24,16 @@
                  [ring/ring-core "1.5.1"]
                  [ring/ring-defaults "0.2.2"]
                  [ring/ring-servlet "1.4.0"]
-                 [selmer "1.10.5"]]
+                 [selmer "1.10.5"]
+
+                 ;; custom libs for messenger
+                 [clj-http "3.4.1"]
+                 [cheshire "5.7.0"]]
 
   :min-lein-version "2.0.0"
 
   :jvm-opts ["-server" "-Dconf=.lein-env"]
-  :source-paths ["src/clj"]
+  :source-paths ["src/clj" "modules/bots"]
   :resource-paths ["resources"]
   :target-path "target/%s/"
   :main clojure-bot-conf.core
@@ -42,7 +46,7 @@
    :init clojure-bot-conf.handler/init
    :destroy clojure-bot-conf.handler/destroy
    :name "clojure-bot-conf.war"}
-  
+
 
   :profiles
   {:uberjar {:omit-source true
@@ -61,7 +65,7 @@
                                  [pjstadig/humane-test-output "0.8.1"]
                                  [directory-naming/naming-java "0.8"]]
                   :plugins      [[com.jakemccrary/lein-test-refresh "0.18.1"]]
-                  
+
                   :source-paths ["env/dev/clj" "test/clj"]
                   :resource-paths ["env/dev/resources"]
                   :repl-options {:init-ns user}

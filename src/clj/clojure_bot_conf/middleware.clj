@@ -7,7 +7,8 @@
             [ring.middleware.format :refer [wrap-restful-format]]
             [clojure-bot-conf.config :refer [env]]
             [ring-ttl-session.core :refer [ttl-memory-store]]
-            [ring.middleware.defaults :refer [site-defaults wrap-defaults]])
+            [ring.middleware.defaults :refer [site-defaults wrap-defaults]]
+            [ring.middleware.json :refer [wrap-json-body wrap-json-response]])
   (:import [javax.servlet ServletContext]))
 
 (defn wrap-context [handler]
@@ -51,6 +52,11 @@
       ;; disable wrap-formats for websockets
       ;; since they're not compatible with this middleware
       ((if (:websocket? request) handler wrapped) request))))
+
+(defn wrap-json [handler]
+  (-> handler
+      wrap-json-response
+      (wrap-json-body {:keywords? true :bigdecimals? true})))
 
 (defn wrap-base [handler]
   (-> ((:middleware defaults) handler)

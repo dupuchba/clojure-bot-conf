@@ -1,7 +1,7 @@
 (ns clojure-bot-conf.handler
   (:require [compojure.core :refer [routes wrap-routes]]
             [clojure-bot-conf.layout :refer [error-page]]
-            [clojure-bot-conf.routes.callback :refer [home-routes]]
+            [clojure-bot-conf.routes.callback :refer [callback-routes]]
             [compojure.route :as route]
             [clojure-bot-conf.env :refer [defaults]]
             [mount.core :as mount]
@@ -33,9 +33,8 @@
 
 (def app-routes
   (routes
-    (-> #'home-routes
-        (wrap-routes middleware/wrap-csrf)
-        (wrap-routes middleware/wrap-formats))
+    (-> #'callback-routes
+        (wrap-routes middleware/wrap-json))
     (route/not-found
       (:body
         (error-page {:status 404

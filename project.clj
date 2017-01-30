@@ -24,11 +24,13 @@
                  [ring/ring-core "1.5.1"]
                  [ring/ring-defaults "0.2.2"]
                  [ring/ring-servlet "1.4.0"]
+                 [ring/ring-json "0.4.0"]
                  [selmer "1.10.5"]
 
                  ;; custom libs for messenger
                  [clj-http "3.4.1"]
-                 [cheshire "5.7.0"]]
+                 [cheshire "5.7.0"]
+                 [org.clojure/core.async "0.2.395"]]
 
   :min-lein-version "2.0.0"
 

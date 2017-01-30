@@ -22,14 +22,23 @@
   "Given facebook entries, create a thread which dispatch message to their
   actions."
   [out entries]
-  (let [in (a/to-chan (:entry entries))]
+  (let [in (a/to-chan (:entry entries))
+        message (chan (a/sliding-buffer 1024))]
+    ;; Do something usefull when there are many apps for one vendor.
     (thread
       (try
         (when-some [val (<!! in)]
           (println "Here is some data !!!" val)
-          (>!! out val))
+          (a/onto-chan message (:messaging val)))
         (catch Throwable ex
-          (println "Manage exception here !!!" ex)))))
+          (println "Manage exception here !!!" ex))))
+    (thread
+      (try
+        (when-some [entry (<!! message)]
+          (println "Here are some messages: " entry)
+          (>!! out entry))
+        (catch Throwable ex
+          (println "Do something even more awesome here !")))))
   (response/ok))
 
 ;; Incoming HTTP requests -> Thread manage the reading and stack all the data in a channel
@@ -78,5 +87,5 @@
 
 (go (loop []
       (when-some [entry (<! out)]
-        (workflow! conv :1 conv-storage user-storage entry))
+        (workflow! conv conv-storage user-storage entry))
       (recur)))

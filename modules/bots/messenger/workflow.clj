@@ -15,8 +15,7 @@
 (defprotocol IUserStorage
   "Protocol used to manage user's informations"
   (new-user? [this ^User user] "Return true if user already exist in a given storage, false otherwise.")
-  (save-user! [this ^User user] "Adds user to the storage and returns it.")
-  (get-user [this id] "Returns the user if found from the storage"))
+  (save-user! [this ^User user] "Adds user to the storage and returns it."))
 
 (defprotocol IConversationStorage
   "Protocol that manages Conversations storage"
@@ -132,12 +131,27 @@
 (defn make-user [id]
   (->User id))
 
+(defmulti get-user
+          "Build a user from the entry based on the platform type."
+          (fn [entry]
+            (cond
+              (not (nil? (get-in entry [:sender :id]))) :facebook))
+          :default :platform-not-supported)
+
+(defmethod get-user :facebook
+  [entry]
+  (make-user (get-in entry [:sender :id])))
+
+(defmethod get-user :platform-not-supported
+  [entry]
+  (throw (Throwable. "This is some shit dude !")))
+
 ;; If conv-storage satis
 (defn workflow!
-  [^BotConversation conversation user-id conv-storage user-storage input]
+  [^BotConversation conversation conv-storage user-storage input]
   (if (and (satisfies? IConversationStorage conv-storage)
            (satisfies? IUserStorage user-storage))
-    (let [user (make-user user-id)]
+    (let [user (get-user input)]
       (when (new-user? user-storage user)
         (save-user! user-storage user))
       (if-let [user-conversation (get-conversation conv-storage user)]
@@ -156,6 +170,6 @@
               (save-conversation! conv-storage user bot-msg input))))
         (do
           (save-conversation! conv-storage user (get-default-message conversation) input)
-          (workflow! conversation user-id conv-storage user-storage input))))))
+          (workflow! conversation conv-storage user-storage input))))))
 
 

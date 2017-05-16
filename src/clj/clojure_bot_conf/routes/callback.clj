@@ -5,7 +5,9 @@
             [clojure.java.io :as io]
             [clojure-bot-conf.config :refer [env]]
             [clojure.core.async :as a :refer [<! >! <!! >!! go thread chan]]
-            [messenger.workflow :as w :refer [make-message make-conversation workflow!]]))
+            [messenger.workflow :as w :refer [make-message make-conversation workflow!]]
+            [cheshire.core :refer [generate-string]]
+            [clj-http.client :as client]))
 
 ;; ========================== WebToken validation =============================
 (defn validate-webhook-token
@@ -53,11 +55,30 @@
            (GET "/callback" {params :query-params} (validate-webhook-token params))
            (POST "/callback" {params :body} (webhook params)))
 
+;; ========================== Helper Function =================================
+(def ^:private facebook-graph-url "https://graph.facebook.com/v2.6")
+(def ^:private message-uri "/me/messages")
+
+(defn post-messenger
+  "Helper function that post a message to a given user"
+  [user-id key map]
+  (client/post (str facebook-graph-url message-uri "?access_token=" (:page-access-token env))
+               {:body           (let [body (generate-string {:recipient {:id user-id}
+                                                             key map})]
+                                  body)
+                :content-type   :json
+                :socket-timeout 10000
+                :conn-timeout   10000
+                :accept         :json}))
+
+
 ;; Example
 (def mess1 (make-message
-             :mess1
+             :welcome-message
              (fn [input]
-               (println "mess 1"))
+               (post-messenger
+                 (get-in input [:sender :id])
+                 :message {:text "Par exemple le button de type \"URL\" permet d'ouvrir une page web :"}))
              (fn [input]
                (println "called")
                :mess2)
@@ -71,7 +92,7 @@
              (fn [input]
                (println "mess 2"))
              (fn [input]
-               :mess1)
+               :welcome-message)
              (fn [input]
                true)
              (fn [input]

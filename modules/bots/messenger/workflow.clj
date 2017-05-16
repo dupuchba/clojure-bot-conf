@@ -1,5 +1,8 @@
 (ns messenger.workflow)
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Objectif à rappeler => savoir faire un button à la sortie de la conférence !
+
 ;; Internals
 (defprotocol IParse
   (parse [this]))

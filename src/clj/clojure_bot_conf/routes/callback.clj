@@ -14,7 +14,7 @@
   "Validate query-params map according to user's defined webhook-token.
   Return hub.challenge if valid, error message else."
   [params]
-  (println)
+  (println "dddd")
   (if (and (= (params "hub.mode") "subscribe")
            (= (params "hub.verify_token") (:webhooks-verify-token env)))
     (params "hub.challenge")
@@ -90,7 +90,23 @@
 (def mess2 (make-message
              :mess2
              (fn [input]
-               (println "mess 2"))
+               (post-messenger
+                 (get-in input [:sender :id])
+                 :message {:text "Message 2"}))
+             (fn [input]
+               :mess3)
+             (fn [input]
+               true)
+             (fn [input]
+               (println "error 2"))
+             :default true))
+
+(def mess3 (make-message
+             :mess3
+             (fn [input]
+               (post-messenger
+                 (get-in input [:sender :id])
+                 :message {:text "Message 3"}))
              (fn [input]
                :welcome-message)
              (fn [input]
@@ -99,7 +115,7 @@
                (println "error 2"))
              :default true))
 
-(def conv (make-conversation :conv1 [mess1 mess2]))
+(def conv (make-conversation :conv1 [mess1 mess2 mess3]))
 
 (def conv-storage (w/->ConversationAtomStorage (atom {})))
 

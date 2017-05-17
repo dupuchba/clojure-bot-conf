@@ -150,7 +150,8 @@
   (throw (Throwable. "This is some shit dude !")))
 
 ;; If conv-storage satis
-(defn workflow!
+(defn
+  workflow!
   [^BotConversation conversation conv-storage user-storage input]
   (if (and (satisfies? IConversationStorage conv-storage)
            (satisfies? IUserStorage user-storage))
@@ -166,12 +167,14 @@
                   next-msg-id (next-state-fn input)
                   next-bot-msg (get-message conversation next-msg-id)
                   action-fn (:action next-bot-msg)]
+              (println "NOT DOOOOOOOOO")
               (action-fn input)
               (save-conversation! conv-storage user next-bot-msg input))
             (let [error-fn (:error bot-msg)]
               (error-fn input)
               (save-conversation! conv-storage user bot-msg input))))
         (do
+          (println "DOOOOOOOOO")
           (save-conversation! conv-storage user (get-default-message conversation) input)
           (workflow! conversation conv-storage user-storage input))))))
 
